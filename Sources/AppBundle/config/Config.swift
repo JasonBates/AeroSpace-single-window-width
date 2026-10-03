@@ -57,6 +57,7 @@ struct Config: ConvenienceMutable {
     var onFocusedMonitorChanged: Shell<any Command> = .empty
 
     var gaps: Gaps = .zero
+    var singleWindowWidthRules: [SingleWindowWidthRule] = []
     var singleWindowAspectRatio: AspectRatio? = nil
     var singleWindowMinMonitorWidth: Int = 0
     var applyAspectToAccordion: ApplyAspectOrientation = .all
@@ -88,6 +89,23 @@ enum DefaultContainerOrientation: String {
 struct AspectRatio: Equatable, Sendable {
     let width: CGFloat
     let height: CGFloat
+}
+
+struct SingleWindowWidthRule: Equatable, Sendable {
+    let minMonitorWidth: Int
+    let widthPercent: Int
+}
+
+extension Config {
+    func singleWindowWidth(monitorWidth: CGFloat, availableWidth: CGFloat, height: CGFloat) -> CGFloat? {
+        if !singleWindowWidthRules.isEmpty {
+            return singleWindowWidthRules.last(where: { monitorWidth >= CGFloat($0.minMonitorWidth) })
+                .map { availableWidth * CGFloat($0.widthPercent) / 100 }
+        }
+        guard let ratio = singleWindowAspectRatio,
+              monitorWidth >= CGFloat(singleWindowMinMonitorWidth) else { return nil }
+        return height * ratio.width / ratio.height
+    }
 }
 
 enum ApplyAspectOrientation: String {

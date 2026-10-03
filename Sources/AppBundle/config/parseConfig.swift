@@ -155,6 +155,7 @@ private let configParser: [String: any ParserProtocol<Config>] = [
 
     "gaps": Parser(\.gaps, parseGaps),
     "focus-follows-mouse": Parser(\.focusFollowsMouse, parseFocusFollowsMouse),
+    "single-window-width-rules": Parser(\.singleWindowWidthRules, parseSingleWindowWidthRules),
     "single-window-aspect-ratio": Parser(\.singleWindowAspectRatio, parseSingleWindowAspectRatio),
     "single-window-min-monitor-width": Parser(\.singleWindowMinMonitorWidth, parseInt),
     "apply-aspect-to-accordion": Parser(\.applyAspectToAccordion, parseApplyAspectOrientation),
@@ -421,6 +422,34 @@ private func parseSingleWindowAspectRatio(_ raw: OrderedJson, _ backtrace: Confi
             return .failure(.init(backtrace, "Expected format 'WIDTH:HEIGHT' (e.g. '16:9')"))
         }
         return .success(AspectRatio(width: CGFloat(parts[0]), height: CGFloat(parts[1])))
+    }
+}
+
+private func parseSingleWindowWidthRules(_ raw: OrderedJson, _ backtrace: ConfigBacktrace) -> ResOrConfigParseDiagnostic<[SingleWindowWidthRule]> {
+    parseTomlArray(raw, backtrace).flatMap { rules in
+        var result: [SingleWindowWidthRule] = []
+        for (index, rawRule) in rules.enumerated() {
+            let location = backtrace + .index(index)
+            guard let fields = rawRule.asDictOrNil else {
+                return .failure(expectedActualTypeDiagnostic(expected: .table, actual: rawRule.tomlType, location))
+            }
+            guard fields.count == 2,
+                  let rawMinWidth = fields["min-monitor-width"],
+                  let rawPercent = fields["width-percent"] else {
+                return .failure(.init(location, "Expected exactly 'min-monitor-width' and 'width-percent'"))
+            }
+            guard let minWidth = rawMinWidth.asIntOrNil, minWidth >= 0 else {
+                return .failure(.init(location + .key("min-monitor-width"), "Expected a non-negative integer"))
+            }
+            guard let percent = rawPercent.asIntOrNil, (1...100).contains(percent) else {
+                return .failure(.init(location + .key("width-percent"), "Expected an integer from 1 to 100"))
+            }
+            guard !result.contains(where: { $0.minMonitorWidth == minWidth }) else {
+                return .failure(.init(location + .key("min-monitor-width"), "Duplicate monitor-width threshold"))
+            }
+            result.append(.init(minMonitorWidth: minWidth, widthPercent: percent))
+        }
+        return .success(result.sorted { $0.minMonitorWidth < $1.minMonitorWidth })
     }
 }
 

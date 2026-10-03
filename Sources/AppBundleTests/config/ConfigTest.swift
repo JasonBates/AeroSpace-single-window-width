@@ -490,6 +490,41 @@ final class ConfigTest: XCTestCase {
         assertEquals(result.config.singleWindowAspectRatio, AspectRatio(width: 8, height: 9))
         assertEquals(result.config.singleWindowMinMonitorWidth, 2000)
         assertEquals(result.config.applyAspectToAccordion, ApplyAspectOrientation.none)
+        assertEquals(result.config.singleWindowWidth(monitorWidth: 1512, availableWidth: 1500, height: 900), nil)
+        assertEquals(result.config.singleWindowWidth(monitorWidth: 2560, availableWidth: 2540, height: 900), 800)
+    }
+
+    func testSingleWindowWidthRulesSelectByMonitorWidth() {
+        let result = parseConfig(
+            """
+            config-version = 2
+            single-window-width-rules = [
+                { min-monitor-width = 2000, width-percent = 50 },
+                { min-monitor-width = 0, width-percent = 66 },
+            ]
+            """,
+        )
+        assertEquals(result.errors, [])
+        assertEquals(result.config.singleWindowWidth(monitorWidth: 1512, availableWidth: 1500, height: 900), 990)
+        assertEquals(result.config.singleWindowWidth(monitorWidth: 2000, availableWidth: 1980, height: 900), 990)
+        assertEquals(result.config.singleWindowWidth(monitorWidth: 2560, availableWidth: 2540, height: 1400), 1270)
+        let unmatched = parseConfig("single-window-width-rules = [{ min-monitor-width = 2000, width-percent = 50 }]")
+        assertEquals(unmatched.config.singleWindowWidth(monitorWidth: 1512, availableWidth: 1500, height: 900), nil)
+    }
+
+    func testSingleWindowWidthRulesRejectInvalidEntries() {
+        let result = parseConfig(
+            """
+            config-version = 2
+            single-window-width-rules = [
+                { min-monitor-width = 0, width-percent = 66 },
+                { min-monitor-width = 0, width-percent = 50 },
+            ]
+            """,
+        )
+        assertEquals(result.strErrors, ["[ERROR] single-window-width-rules[1].min-monitor-width: Duplicate monitor-width threshold"])
+        assertEquals(parseConfig("single-window-width-rules = [{ min-monitor-width = 0, width-percent = 101 }]").strErrors,
+                     ["[ERROR] single-window-width-rules[0].width-percent: Expected an integer from 1 to 100"])
     }
 
     func testParseGaps() {
