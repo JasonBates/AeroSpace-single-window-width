@@ -1,5 +1,20 @@
 # AeroSpace Beta [![Build](https://github.com/nikitabobko/AeroSpace/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/nikitabobko/AeroSpace/actions/workflows/build.yml)
 
+> [!IMPORTANT]
+> **Personal working branch.** I use this build on my Mac Studio and laptop as a working
+> solution for sizing a lone tiled window. I am sharing it as a proof of concept in
+> [AeroSpace discussion #2308](https://github.com/nikitabobko/AeroSpace/discussions/2308),
+> not as an official release or a separately maintained fork. See
+> [upstream AeroSpace](https://github.com/nikitabobko/AeroSpace) for official releases.
+>
+> Compared with the upstream v0.21.3-Beta base, this branch ports the single-window
+> and accordion aspect-ratio work from [PR #2093](https://github.com/nikitabobko/AeroSpace/pull/2093)
+> and adds `single-window-width-rules`. These rules centre a lone tiled window at a
+> percentage of the current monitor's usable width, selected by monitor width in
+> scaled display points. My configuration uses 66% below 2000 points and 50% from
+> 2000 points upward, with accordion sizing disabled. The Homebrew instructions below
+> install upstream AeroSpace, not this branch.
+
 <img src="./resources/Assets.xcassets/AppIcon.appiconset/icon.png" width="40%" align="right">
 
 AeroSpace is an i3-like tiling window manager for macOS
