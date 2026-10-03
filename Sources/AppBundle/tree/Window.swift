@@ -8,6 +8,12 @@ open class Window: TreeNode, Hashable {
     var isFullscreen: Bool = false
     var noOuterGapsInFullscreen: Bool = false
     var layoutReason: LayoutReason = .standard
+    // Temporary adjustment for this window while it is the only tiled window.
+    var singleWindowWidthAdjustment: CGFloat = 0
+
+    func singleWindowWidth(base: CGFloat, available: CGFloat) -> CGFloat {
+        min(available, max(min(200, available), base + singleWindowWidthAdjustment))
+    }
 
     @MainActor
     init(id: UInt32, _ app: any AbstractApp, lastFloatingSize: CGSize?, parent: NonLeafTreeNodeObject, adaptiveWeight: CGFloat, index: Int) {

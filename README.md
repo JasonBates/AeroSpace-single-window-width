@@ -41,5 +41,11 @@ sizing of an accordion (a stack of overlapping windows) is disabled here, so
 multiple tiled windows use the normal layout. AeroSpace full screen still
 fills the display. The width rules can be edited for other monitors and setups.
 
+While a tiled window is alone, the normal `resize smart +50` and
+`resize smart -50` commands widen or narrow it by 50 display points and keep
+it centred. The adjustment belongs only to that window and lasts until it
+closes or AeroSpace restarts. With multiple tiled windows, the same commands
+continue to resize tiles normally.
+
 The [width-rules commit](https://github.com/JasonBates/AeroSpace-single-window-width/commit/92be41f)
 shows the additional implementation and tests.

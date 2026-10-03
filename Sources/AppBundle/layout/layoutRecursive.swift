@@ -19,11 +19,15 @@ extension Workspace {
                height: height
            )
         {
-            if constrainedWidth < width {
-                let xOffset = (width - constrainedWidth) / 2
+            let loneWindow = rootTilingContainer.hasSingleLeafWindowRecursive
+                ? rootTilingContainer.anyLeafWindowRecursive : nil
+            let targetWidth = loneWindow?.singleWindowWidth(base: constrainedWidth, available: width)
+                ?? min(constrainedWidth, width)
+            if targetWidth < width {
+                let xOffset = (width - targetWidth) / 2
                 point = CGPoint(x: rect.topLeftX + xOffset, y: rect.topLeftY)
-                virtual = Rect(topLeftX: rect.topLeftX + xOffset, topLeftY: rect.topLeftY, width: constrainedWidth, height: rect.height)
-                width = constrainedWidth
+                virtual = Rect(topLeftX: rect.topLeftX + xOffset, topLeftY: rect.topLeftY, width: targetWidth, height: rect.height)
+                width = targetWidth
             }
         }
         try await layoutRecursive(point, width: width, height: height, virtual: virtual, LayoutContext(self))

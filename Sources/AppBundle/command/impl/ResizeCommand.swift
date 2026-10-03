@@ -8,6 +8,31 @@ struct ResizeCommand: Command {
     func run(_ env: CmdEnv, _ io: CmdIo) -> BinaryExitCode {
         guard let target = args.resolveTargetOrReportError(env, io) else { return .fail }
 
+        if let window = target.windowOrNil,
+           args.dimension.val == .smart || args.dimension.val == .width,
+           let workspace = window.nodeWorkspace,
+           workspace.rootTilingContainer.hasSingleLeafWindowRecursive,
+           workspace.rootTilingContainer.anyLeafWindowRecursive === window
+        {
+            let monitor = workspace.workspaceMonitor
+            let rect = monitor.visibleRectPaddedByOuterGaps
+            if let baseWidth = config.singleWindowWidth(
+                monitorWidth: monitor.width,
+                availableWidth: rect.width,
+                height: rect.height - 1
+            ) {
+                let currentWidth = window.singleWindowWidth(base: baseWidth, available: rect.width)
+                let requestedWidth: CGFloat = switch args.units.val {
+                    case .set(let unit): CGFloat(unit)
+                    case .add(let unit): currentWidth + CGFloat(unit)
+                    case .subtract(let unit): currentWidth - CGFloat(unit)
+                }
+                let newWidth = min(rect.width, max(min(200, rect.width), requestedWidth))
+                window.singleWindowWidthAdjustment = newWidth - baseWidth
+                return .succ
+            }
+        }
+
         let candidates = target.windowOrNil?.parentsWithSelf
             .filter { ($0.parent as? TilingContainer)?.layout == .tiles }
             ?? []

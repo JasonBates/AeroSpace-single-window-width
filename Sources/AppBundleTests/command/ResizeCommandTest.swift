@@ -163,4 +163,46 @@ final class ResizeCommandTest: XCTestCase {
         let result = await parseCommand("resize width +2").cmdOrDie.run(.defaultEnv, .emptyStdin)
         assertEquals(result.exitCode.rawValue, 2)
     }
+
+    func testSingleWindowSmartResizeAdjustsOnlyThatWindow() async {
+        config.singleWindowWidthRules = [SingleWindowWidthRule(minMonitorWidth: 0, widthPercent: 50)]
+        let root = Workspace.get(byName: name).rootTilingContainer
+        let window = TestWindow.new(id: 1, parent: root)
+        assertEquals(window.focusWindow(), true)
+
+        assertEquals(window.singleWindowWidth(base: 960, available: 1920), 960)
+        let grow = await parseCommand("resize smart +50").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(grow.exitCode.rawValue, 0)
+        assertEquals(window.singleWindowWidth(base: 960, available: 1920), 1010)
+
+        let otherWindow = TestWindow.new(id: 2, parent: root)
+        assertEquals(otherWindow.singleWindowWidthAdjustment, 0)
+        assertEquals(window.singleWindowWidthAdjustment, 50)
+        otherWindow.unbindFromParent()
+
+        let shrink = await parseCommand("resize smart -50").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(shrink.exitCode.rawValue, 0)
+        assertEquals(window.singleWindowWidth(base: 960, available: 1920), 960)
+        assertEquals(window.singleWindowWidthAdjustment, 0)
+    }
+
+    func testSingleWindowWidthResizeClampsAndKeepsAdjustmentOnWindow() async {
+        config.singleWindowWidthRules = [SingleWindowWidthRule(minMonitorWidth: 0, widthPercent: 50)]
+        let root = Workspace.get(byName: name).rootTilingContainer
+        let window = TestWindow.new(id: 1, parent: root)
+        assertEquals(window.focusWindow(), true)
+
+        let grow = await parseCommand("resize width +2000").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(grow.exitCode.rawValue, 0)
+        assertEquals(window.singleWindowWidth(base: 960, available: 1920), 1920)
+
+        let shrink = await parseCommand("resize width -2000").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(shrink.exitCode.rawValue, 0)
+        assertEquals(window.singleWindowWidth(base: 960, available: 1920), 200)
+
+        let secondWindow = TestWindow.new(id: 2, parent: root)
+        assertEquals(secondWindow.focusWindow(), true)
+        assertEquals(secondWindow.singleWindowWidthAdjustment, 0)
+        assertEquals(window.singleWindowWidth(base: 960, available: 1920), 200)
+    }
 }
