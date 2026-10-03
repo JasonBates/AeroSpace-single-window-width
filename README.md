@@ -5,6 +5,10 @@ has one tiled window, it centres that window at a configurable percentage of the
 current monitor's usable width. The percentage can change with monitor width, so
 the same configuration works across my displays.
 
+![Illustration of a lone tiled window centred at 50% width on a standard 16:9 monitor](docs/assets/single-window-width.svg)
+
+*Illustration of the 50% rule on a standard monitor; this is not an app screenshot.*
+
 I am sharing the code as a working solution and proof of concept for
 [upstream discussion #2308](https://github.com/nikitabobko/AeroSpace/discussions/2308).
 This is not an official AeroSpace release or a fork I plan to maintain
