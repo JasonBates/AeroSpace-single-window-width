@@ -12,7 +12,11 @@ extension Workspace {
         var width = rect.width
         let height = rect.height - 1
         var virtual = rect
-        if let ratio = config.singleWindowAspectRatio, shouldApplyAspectRatio(to: rootTilingContainer) {
+        // Narrow monitors (e.g. a laptop's built-in display) are below the threshold and keep full-width windows
+        if let ratio = config.singleWindowAspectRatio,
+           workspaceMonitor.width >= CGFloat(config.singleWindowMinMonitorWidth),
+           shouldApplyAspectRatio(to: rootTilingContainer)
+        {
             let constrainedWidth = height * ratio.width / ratio.height
             if constrainedWidth < width {
                 let xOffset = (width - constrainedWidth) / 2

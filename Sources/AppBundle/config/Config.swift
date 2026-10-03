@@ -58,6 +58,7 @@ struct Config: ConvenienceMutable {
 
     var gaps: Gaps = .zero
     var singleWindowAspectRatio: AspectRatio? = nil
+    var singleWindowMinMonitorWidth: Int = 0
     var applyAspectToAccordion: ApplyAspectOrientation = .all
     var workspaceToMonitorForceAssignment: [String: [MonitorDescription]] = [:]
     var modes: [String: Mode] = [:]

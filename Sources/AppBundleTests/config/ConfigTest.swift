@@ -478,6 +478,20 @@ final class ConfigTest: XCTestCase {
         XCTAssertTrue(!"System Settings".contains(caseInsensitiveRegex: CaseInsensitiveRegex.new("^settings^").getOrNil(appendErrorTo: &devNull)!))
     }
 
+    func testParseSingleWindowAspectRatio() {
+        let result = parseConfig(
+            """
+            single-window-aspect-ratio = '8 9'
+            single-window-min-monitor-width = 2000
+            apply-aspect-to-accordion = 'none'
+            """,
+        )
+        assertEquals(result.errors, [])
+        assertEquals(result.config.singleWindowAspectRatio, AspectRatio(width: 8, height: 9))
+        assertEquals(result.config.singleWindowMinMonitorWidth, 2000)
+        assertEquals(result.config.applyAspectToAccordion, ApplyAspectOrientation.none)
+    }
+
     func testParseGaps() {
         let result1 = parseConfig(
             """
