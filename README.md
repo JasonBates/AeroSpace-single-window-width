@@ -67,9 +67,10 @@ build does not recognise `focus-mode`):
 ctrl-alt-cmd-z = 'focus-mode'
 ```
 
-Pressing it again returns to the existing tiled view. Focus Mode follows the
-focused window within the same workspace and exits on a workspace switch or
-when AeroSpace is disabled. It preserves the workspace tree and tile weights;
+Pressing it again returns to the existing tiled view. Keyboard focus commands
+can select another window in the same workspace. Clicking outside the focused
+window, switching workspaces, or disabling AeroSpace exits Focus Mode. It
+preserves the workspace tree and tile weights;
 for a floating window it also restores the original frame. AeroSpace full
 screen takes precedence and exits Focus Mode.
 

@@ -24,7 +24,8 @@ display; with two, it moves to the macOS main display. With one display, it
 stays there. The window returns to its original tiled position when Focus Mode
 ends. The window tree and tile sizes are not changed.
 
-Focus Mode follows focus to another window in the same workspace. Switching
+Keyboard focus commands can select another window in the same workspace while
+Focus Mode stays active. Clicking outside the focused window, switching
 workspaces, losing the focused window, or disabling AeroSpace exits the mode.
 
 Add a binding such as `ctrl-alt-cmd-z = 'focus-mode'` to your configuration.
