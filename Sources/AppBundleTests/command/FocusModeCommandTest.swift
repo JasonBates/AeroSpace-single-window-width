@@ -71,4 +71,14 @@ final class FocusModeCommandTest: XCTestCase {
         assertEquals(restored?.width, original.width)
         assertEquals(restored?.height, original.height)
     }
+
+    func testDoesNotMoveFloatingWindowWhenItsOriginalFrameIsUnavailable() async {
+        let workspace = focus.workspace
+        let window = TestWindow.new(id: 1, parent: workspace.floatingWindowsContainer)
+        assertTrue(window.focusWindow())
+
+        let result = await parseCommand("focus-mode").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(result.exitCode.rawValue, 2)
+        assertFalse(FocusMode.shared.isActive)
+    }
 }

@@ -11,10 +11,18 @@ final class FocusMode {
 
     var isActive: Bool { workspaceName != nil }
 
-    func start(window: Window, workspace: Workspace) async {
+    func start(window: Window, workspace: Workspace) async -> Bool {
+        let floatingFrame: Rect?
+        if window.isFloating {
+            guard let frame = try? await window.getAxRect(.nonCancellable) else { return false }
+            floatingFrame = frame
+        } else {
+            floatingFrame = nil
+        }
         workspaceName = workspace.name
         windowId = window.windowId
-        originalFloatingFrame = window.isFloating ? try? await window.getAxRect(.nonCancellable) : nil
+        originalFloatingFrame = floatingFrame
+        return true
     }
 
     func stop() {
@@ -36,9 +44,19 @@ final class FocusMode {
             return
         }
         if windowId != window.windowId {
+            let floatingFrame: Rect?
+            if window.isFloating {
+                guard let frame = try? await window.getAxRect(.nonCancellable) else {
+                    stop()
+                    return
+                }
+                floatingFrame = frame
+            } else {
+                floatingFrame = nil
+            }
             restoreFloatingWindow()
             windowId = window.windowId
-            originalFloatingFrame = window.isFloating ? try? await window.getAxRect(.nonCancellable) : nil
+            originalFloatingFrame = floatingFrame
         }
     }
 
