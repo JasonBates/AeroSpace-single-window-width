@@ -51,8 +51,10 @@ final class FocusDimmer {
                 context.duration = 0.18
                 panel.animator().alphaValue = 0
             } completionHandler: { [weak self, weak panel] in
-                guard self?.animationGeneration == generation else { return }
-                panel?.orderOut(nil)
+                Task { @MainActor in
+                    guard self?.animationGeneration == generation else { return }
+                    panel?.orderOut(nil)
+                }
             }
         }
     }
