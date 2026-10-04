@@ -28,6 +28,7 @@ import AppKit
             // todo: It would be cool to somehow reuse isWindowHeuristic logic here
             if await isAxWindowUnderMouse(location) == false { return }
             try checkCancellation()
+            if FocusMode.shared.containsFocusedWindow(at: location) { return }
             let workspace = location.monitorApproximation.activeWorkspace
             var window: Window? = nil
             for child in workspace.floatingWindowsContainer.mruChildren {

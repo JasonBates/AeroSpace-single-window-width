@@ -101,6 +101,15 @@ final class FocusMode {
         FocusDimmer.shared.show(around: frame)
     }
 
+    func containsFocusedWindow(at point: CGPoint) -> Bool {
+        guard let windowId,
+              let window = Window.get(byId: windowId),
+              let workspace = window.nodeWorkspace,
+              let frame = frame(for: window, in: workspace)
+        else { return false }
+        return frame.contains(point)
+    }
+
     private func restoreFloatingWindow() {
         guard let windowId,
               let originalFloatingFrame,

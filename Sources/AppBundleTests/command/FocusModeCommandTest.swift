@@ -38,6 +38,8 @@ final class FocusModeCommandTest: XCTestCase {
         let focusedFrame = try await first.getAxRect(.nonCancellable)
         assertEquals(focusedFrame?.topLeftX, 480)
         assertEquals(focusedFrame?.width, 960)
+        assertTrue(FocusMode.shared.containsFocusedWindow(at: CGPoint(x: 900, y: 500)))
+        assertFalse(FocusMode.shared.containsFocusedWindow(at: CGPoint(x: 100, y: 500)))
         assertEquals(root.layout, .tiles)
         assertEquals(root.children.map(\.hWeight), initialWeights)
         assertEquals((try await second.getAxRect(.nonCancellable))?.width, initialFrame?.width)
