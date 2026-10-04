@@ -62,7 +62,7 @@ final class FocusMode {
 
     func frame(for window: Window, in workspace: Workspace) -> Rect? {
         guard workspaceName == workspace.name, windowId == window.windowId else { return nil }
-        let monitor = workspace.workspaceMonitor
+        let monitor = destinationMonitor(for: workspace.workspaceMonitor, among: monitors)
         let available = monitor.visibleRectPaddedByOuterGaps
         let baseWidth = config.singleWindowWidth(
             monitorWidth: monitor.width,
@@ -76,6 +76,17 @@ final class FocusMode {
             width: width,
             height: available.height - 1,
         )
+    }
+
+    /// The middle display is the Focus Mode stage. With two displays, use the
+    /// macOS main display; with one, keep the window where it already is.
+    func destinationMonitor(for source: Monitor, among available: [Monitor]) -> Monitor {
+        guard available.count > 1 else { return source }
+        if available.count == 2 {
+            return available.first(where: \.isMain) ?? source
+        }
+        let ordered = available.sortedBy([\.rect.minX, \.rect.minY])
+        return ordered[ordered.count / 2]
     }
 
     func refreshBackdrop() {

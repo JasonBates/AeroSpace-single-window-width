@@ -56,6 +56,9 @@ The `focus-mode` branch adds a reversible centred view for the focused window.
 It uses the same width rules as a lone window, or 66% of the usable display
 width when no rule is configured. A translucent dark layer dims the other
 windows on every display. The layer does not take keyboard or mouse input.
+On a multi-display setup the focused window appears on the middle display
+(or the macOS main display when there are two). It returns to its original
+position when Focus Mode ends. A single-display setup behaves as before.
 
 Add this binding **after installing a build from this branch** (the earlier
 build does not recognise `focus-mode`):

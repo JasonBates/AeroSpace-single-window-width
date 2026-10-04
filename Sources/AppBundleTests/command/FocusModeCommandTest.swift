@@ -6,6 +6,21 @@ import XCTest
 final class FocusModeCommandTest: XCTestCase {
     override func setUp() async throws { setUpWorkspacesForTests() }
 
+    func testDestinationMonitorUsesMiddleDisplayAndSingleDisplayStaysPut() {
+        func display(_ x: CGFloat, main: Bool = false) -> Monitor {
+            TestFocusMonitor(x: x, isMain: main)
+        }
+        let left = display(-1920)
+        let centre = display(0, main: true)
+        let right = display(1920)
+
+        let mode = FocusMode.shared
+        assertEquals(mode.destinationMonitor(for: left, among: [right, left, centre]).rect.minX, 0)
+        assertEquals(mode.destinationMonitor(for: right, among: [right, left, centre]).rect.minX, 0)
+        assertEquals(mode.destinationMonitor(for: left, among: [left, centre]).rect.minX, 0)
+        assertEquals(mode.destinationMonitor(for: left, among: [left]).rect.minX, -1920)
+    }
+
     func testToggleCentresFocusedWindowAndRestoresTiles() async throws {
         config.singleWindowWidthRules = [SingleWindowWidthRule(minMonitorWidth: 0, widthPercent: 50)]
         let workspace = focus.workspace
@@ -81,4 +96,15 @@ final class FocusModeCommandTest: XCTestCase {
         assertEquals(result.exitCode.rawValue, 2)
         assertFalse(FocusMode.shared.isActive)
     }
+}
+
+private struct TestFocusMonitor: Monitor {
+    let x: CGFloat
+    let isMain: Bool
+    var monitorAppKitNsScreenScreensId: Int { 1 }
+    var name: String { "Focus Mode test display" }
+    var rect: Rect { Rect(topLeftX: x, topLeftY: 0, width: 1920, height: 1080) }
+    var visibleRect: Rect { rect }
+    var width: CGFloat { rect.width }
+    var height: CGFloat { rect.height }
 }

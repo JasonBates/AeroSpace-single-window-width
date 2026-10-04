@@ -15,7 +15,9 @@ struct ResizeCommand: Command {
                workspace.rootTilingContainer.anyLeafWindowRecursive === window) ||
                FocusMode.shared.frame(for: window, in: workspace) != nil)
         {
-            let monitor = workspace.workspaceMonitor
+            let monitor = FocusMode.shared.frame(for: window, in: workspace) != nil
+                ? FocusMode.shared.destinationMonitor(for: workspace.workspaceMonitor, among: monitors)
+                : workspace.workspaceMonitor
             let rect = monitor.visibleRectPaddedByOuterGaps
             if let baseWidth = config.singleWindowWidth(
                 monitorWidth: monitor.width,
