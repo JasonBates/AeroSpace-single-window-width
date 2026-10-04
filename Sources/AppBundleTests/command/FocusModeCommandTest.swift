@@ -7,7 +7,7 @@ final class FocusModeCommandTest: XCTestCase {
     override func setUp() async throws { setUpWorkspacesForTests() }
 
     func testDestinationMonitorUsesMiddleDisplayAndSingleDisplayStaysPut() {
-        func display(_ x: CGFloat, main: Bool = false) -> Monitor {
+        func display(_ x: CGFloat, main: Bool = false) -> MonitorInfo {
             TestFocusMonitor(x: x, isMain: main)
         }
         let left = display(-1920)
@@ -100,7 +100,7 @@ final class FocusModeCommandTest: XCTestCase {
     }
 }
 
-private struct TestFocusMonitor: Monitor {
+private struct TestFocusMonitor: MonitorInfo {
     let x: CGFloat
     let isMain: Bool
     var monitorAppKitNsScreenScreensId: Int { 1 }

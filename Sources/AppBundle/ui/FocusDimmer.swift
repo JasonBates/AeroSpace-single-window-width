@@ -14,7 +14,7 @@ final class FocusDimmer {
         animationGeneration += 1
         let appKitRect = CGRect(
             x: windowRect.minX,
-            y: mainMonitor.height - windowRect.maxY,
+            y: mainMonitorInfo.height - windowRect.maxY,
             width: windowRect.width,
             height: windowRect.height,
         )

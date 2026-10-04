@@ -23,7 +23,7 @@ final class MacWindow: Window {
             windowId,
             macApp,
             isStartup
-                ? (rect?.center.monitorApproximation ?? mainMonitor).activeWorkspace
+                ? (rect?.center.monitorApproximation ?? mainMonitorInfo).activeWorkspace
                 : focus.workspace,
             window: nil,
             .cancellable,
@@ -36,7 +36,7 @@ final class MacWindow: Window {
 
         try await debugWindowsIfRecording(window, .cancellable)
         if try await !restoreClosedWindowsCacheIfNeeded(newlyDetectedWindow: window) {
-            await tryOnWindowDetected(window)
+            await runOnWindowDetected(ifConventional: window)
         }
         return window
     }
@@ -241,11 +241,21 @@ private func unbindAndGetBindingDataForNewTilingWindow(_ workspace: Workspace, w
 }
 
 @MainActor
-func tryOnWindowDetected(_ window: Window) async {
+func runOnWindowDetected(ifConventional window: Window) async {
     switch window.windowParentCases {
         case .tilingContainer, .floatingWindowsContainer, .macosMinimizedWindowsContainer,
              .macosFullscreenWindowsContainer, .macosHiddenAppsWindowsContainer:
+            let layout = global_layoutForNextDetectedWindow
+            global_layoutForNextDetectedWindow = nil
+            if let layout {
+                await LayoutCommand(args: LayoutCmdArgs(rawArgs: [], toggleBetween: [layout]))
+                    .run(.defaultEnv.withWindowId(window.windowId), .emptyStdin)
+            }
             _ = await onWindowDetected(.defaultEnv, CmdIoImpl.emptyStdinIgnoringOut, window)
+            if let layout {
+                await LayoutCommand(args: LayoutCmdArgs(rawArgs: [], toggleBetween: [layout]))
+                    .run(.defaultEnv.withWindowId(window.windowId), .emptyStdin)
+            }
         case .macosPopupWindowsContainer, .unbound:
             break
     }
