@@ -1,0 +1,31 @@
+= aerospace-focus-mode(1)
+include::util/man-attributes.adoc[]
+:manname: aerospace-focus-mode
+// tag::purpose[]
+:manpurpose: Toggle a centred focused window over a dimmed desktop
+// end::purpose[]
+
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospace focus-mode [-h|--help]
+// end::synopsis[]
+
+== Description
+
+// tag::body[]
+{manpurpose}
+
+Focus Mode temporarily centres the focused window using the configured
+`single-window-width-rules`. Other windows keep their tiled positions beneath a
+dark, click-through backdrop. Press the binding again to restore the normal
+view. The window tree and tile sizes are not changed.
+
+Focus Mode follows focus to another window in the same workspace. Switching
+workspaces, losing the focused window, or disabling AeroSpace exits the mode.
+
+Add a binding such as `ctrl-alt-cmd-z = 'focus-mode'` to your configuration.
+
+// end::body[]
+
+include::util/man-footer.adoc[]

@@ -11,8 +11,9 @@ struct ResizeCommand: Command {
         if let window = target.windowOrNil,
            args.dimension.val == .smart || args.dimension.val == .width,
            let workspace = window.nodeWorkspace,
-           workspace.rootTilingContainer.hasSingleLeafWindowRecursive,
-           workspace.rootTilingContainer.anyLeafWindowRecursive === window
+           ((workspace.rootTilingContainer.hasSingleLeafWindowRecursive &&
+               workspace.rootTilingContainer.anyLeafWindowRecursive === window) ||
+               FocusMode.shared.frame(for: window, in: workspace) != nil)
         {
             let monitor = workspace.workspaceMonitor
             let rect = monitor.visibleRectPaddedByOuterGaps

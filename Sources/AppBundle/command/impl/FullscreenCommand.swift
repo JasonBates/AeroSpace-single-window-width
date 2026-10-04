@@ -25,6 +25,9 @@ struct FullscreenCommand: Command {
                     return .succ(io.err(msg))
             }
         }
+        if newState && FocusMode.shared.isActive {
+            FocusMode.shared.stop()
+        }
         window.isFullscreen = newState
         window.noOuterGapsInFullscreen = args.noOuterGaps
 

@@ -71,7 +71,10 @@ extension TreeNode {
             case .window(let window):
                 if window.windowId != currentlyManipulatedWithMouseWindowId {
                     lastAppliedLayoutVirtualRect = virtual
-                    if window.isFullscreen && window == context.workspace.rootTilingContainer.mostRecentWindowRecursive {
+                    if let focusFrame = FocusMode.shared.frame(for: window, in: context.workspace) {
+                        lastAppliedLayoutPhysicalRect = physicalRect
+                        window.setAxFrame(focusFrame.topLeftCorner, focusFrame.size)
+                    } else if window.isFullscreen && window == context.workspace.rootTilingContainer.mostRecentWindowRecursive {
                         lastAppliedLayoutPhysicalRect = nil
                         window.layoutFullscreen(context)
                     } else {
@@ -110,6 +113,10 @@ private struct LayoutContext {
 extension Window {
     @MainActor
     fileprivate func layoutFloatingWindow(_ context: LayoutContext) async throws {
+        if let focusFrame = FocusMode.shared.frame(for: self, in: context.workspace) {
+            setAxFrame(focusFrame.topLeftCorner, focusFrame.size)
+            return
+        }
         let workspace = context.workspace
         let windowRect = try await getAxRect(.cancellable) // Probably not idempotent
         let currentMonitor = windowRect?.center.monitorApproximation

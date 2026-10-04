@@ -32,6 +32,8 @@ extension CmdArgs {
                 command = FocusCommand(args: self as! FocusCmdArgs)
             case .focusBackAndForth:
                 command = FocusBackAndForthCommand(args: self as! FocusBackAndForthCmdArgs)
+            case .focusMode:
+                command = FocusModeCommand(args: self as! FocusModeCmdArgs)
             case .focusMonitor:
                 command = FocusMonitorCommand(args: self as! FocusMonitorCmdArgs)
             case .fullscreen:

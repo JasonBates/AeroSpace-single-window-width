@@ -49,3 +49,27 @@ continue to resize tiles normally.
 
 The [width-rules commit](https://github.com/JasonBates/AeroSpace-single-window-width/commit/92be41f)
 shows the additional implementation and tests.
+
+## Focus Mode experiment
+
+The `focus-mode` branch adds a reversible centred view for the focused window.
+It uses the same width rules as a lone window, or 66% of the usable display
+width when no rule is configured. A translucent dark layer dims the other
+windows on every display. The layer does not take keyboard or mouse input.
+
+Add this binding **after installing a build from this branch** (the earlier
+build does not recognise `focus-mode`):
+
+```toml
+ctrl-alt-cmd-z = 'focus-mode'
+```
+
+Pressing it again returns to the existing tiled view. Focus Mode follows the
+focused window within the same workspace and exits on a workspace switch or
+when AeroSpace is disabled. It preserves the workspace tree and tile weights;
+for a floating window it also restores the original frame. AeroSpace full
+screen takes precedence and exits Focus Mode.
+
+To return to the earlier version, remove the binding before installing the
+previous signed `0.21.3-aspect` app and CLI. The existing width-rule keys can
+stay in the configuration because that earlier build already supports them.
