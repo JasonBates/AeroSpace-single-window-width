@@ -65,8 +65,9 @@ position when Focus Mode ends. A single-display setup behaves as before.
 [Watch the short Focus Mode demo](assets/focus-mode-demo.mp4). The video is a
 schematic animation, not a screen recording.
 
-Add this binding **after installing a build from this branch** (the earlier
-build does not recognise `focus-mode`):
+The `focus-mode` command has no default shortcut. My optional binding is below;
+add it **after installing a build from this branch** (the earlier build does
+not recognise `focus-mode`):
 
 ```toml
 ctrl-alt-cmd-z = 'focus-mode'

@@ -101,32 +101,43 @@ def monitor(x, y, w, h, caption):
 
 
 def focus_svg(time):
-    enter = ramp(time, 1.15, 2.25)
-    leave = ramp(time, 4.65, 5.65)
+    windows = [
+        (228, 214, 365, 185, "Mail"),
+        (605, 214, 367, 185, "Writing"),
+        (228, 411, 744, 102, "Notes"),
+    ]
+    cycle = min(2, max(0, int((time - .7) // 3.35)))
+    local = time - (.7 + cycle * 3.35)
+    enter = ramp(local, .45, 1.05)
+    leave = ramp(local, 2.1, 2.7)
     amount = enter * (1 - leave)
-    shade = .72 * ramp(time, 1.35, 2.2) * (1 - ramp(time, 4.7, 5.6))
-    xs = [83, 447, 811]
-    y, w, h = 202, 306, 285
-    parts = [monitor(x, y, w, h, name) for x, name in zip(xs, ["LEFT", "CENTRE", "RIGHT"])]
-    parts += [window(98, 243, 133, 224, "Mail"), window(243, 243, 130, 224, "Tasks"),
-              window(462, 243, 133, 224, "Browser"), window(607, 243, 130, 224, "Notes"),
-              window(826, 243, 133, 224, "Chat")]
-    for x in xs:
-        parts.append(rect(x, y, w, h, "#060916", 9, shade))
-    selected_x = mix(971, 513, amount)
-    selected_y = mix(243, 229, amount)
-    selected_w = mix(130, 174, amount)
-    selected_h = mix(224, 243, amount)
-    parts.append(window(selected_x, selected_y, selected_w, selected_h, "Writing", accent="#6d81d2"))
-    key_opacity = ramp(time, .62, 1.0) * (1 - ramp(time, 2.3, 2.7))
-    parts.append(rect(490, 531, 220, 48, "#788bee", 12, key_opacity))
-    parts.append(label(600, 562, "Caps + Z", 24, "#ffffff", 700, "middle", key_opacity))
-    focus_opacity = ramp(time, 2.0, 2.35) * (1 - ramp(time, 4.4, 4.7))
-    parts.append(label(600, 562, "FOCUS MODE", 22, "#d9e0ff", 700, "middle", focus_opacity))
-    exit_opacity = ramp(time, 4.35, 4.7) * (1 - ramp(time, 5.7, 6.0))
-    parts.append(label(600, 562, "Caps + Z again · or click outside", 20, "#d9e0ff", 600, "middle", exit_opacity))
-    return frame("Focus Mode", "Bring the active window to the centre display.", "".join(parts),
-                 "Dim the rest of the desktop. Exit to restore the tiled layout.")
+    selected_x, selected_y, selected_w, selected_h, name = windows[cycle]
+
+    parts = [monitor(210, 177, 780, 355, "")]
+    for index, (x, y, w, h, title) in enumerate(windows):
+        if index != cycle:
+            parts.append(window(x, y, w, h, title))
+    parts.append(rect(210, 177, 780, 355, "#060916", 9, .72 * amount))
+    parts.append(window(
+        mix(selected_x, 415, amount), mix(selected_y, 214, amount),
+        mix(selected_w, 370, amount), mix(selected_h, 299, amount),
+        name, accent="#6d81d2",
+    ))
+    selection_opacity = ramp(local, .05, .35) * (1 - ramp(local, .5, .85))
+    parts.append(rect(selected_x - 3, selected_y - 3, selected_w + 6, selected_h + 6,
+                      "none", 11, selection_opacity, "#a6b3ff", 3))
+
+    shortcut_opacity = ramp(local, .3, .5) * (1 - ramp(local, 1.3, 1.45))
+    parts.append(rect(450, 543, 300, 43, "#788bee", 11, shortcut_opacity))
+    parts.append(label(600, 572, "Your chosen shortcut", 20, "#ffffff", 700, "middle", shortcut_opacity))
+    focus_opacity = ramp(local, 1.5, 1.65) * (1 - ramp(local, 2.05, 2.15))
+    parts.append(label(600, 572, f"FOCUS MODE: {name.upper()}", 20, "#d9e0ff", 700,
+                       "middle", focus_opacity))
+    exit_opacity = ramp(local, 2.25, 2.4) * (1 - ramp(local, 2.9, 3.1))
+    parts.append(label(600, 572, "Shortcut again to restore", 20, "#d9e0ff", 600,
+                       "middle", exit_opacity))
+    return frame("Focus Mode", "Two columns above a full-width tile. Focus each in turn.",
+                 "".join(parts), "Bind focus-mode to any shortcut; the tiled layout stays put.")
 
 
 def lone_svg(time):
@@ -154,7 +165,7 @@ def lone_svg(time):
                  "".join(parts), "Rule shown: 2560-point monitor, centred window at 50% width.")
 
 
-def render(name, duration, draw):
+def render(name, duration, draw, preview_at=3):
     output = HERE / f"{name}.mp4"
     with tempfile.TemporaryDirectory(prefix="aerospace-demo-") as temp:
         path = Path(temp)
@@ -162,7 +173,7 @@ def render(name, duration, draw):
             time = index / FPS
             svg = draw(time)
             cairosvg.svg2png(bytestring=svg.encode(), write_to=str(path / f"{index:04d}.png"))
-            if index == round(3 * FPS):
+            if index == round(preview_at * FPS):
                 (HERE / f"{name}-preview.svg").write_text(svg)
         subprocess.run([
             "ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-framerate", str(FPS),
@@ -173,5 +184,5 @@ def render(name, duration, draw):
 
 
 if __name__ == "__main__":
-    render("focus-mode-demo", 6.6, focus_svg)
+    render("focus-mode-demo", 11.25, focus_svg, preview_at=2.45)
     render("single-window-width-demo", 7.1, lone_svg)
