@@ -195,7 +195,7 @@ final class MacApp: AbstractApp {
         // across monitors when "Displays have separate Spaces" is on. Use the private SkyLight API to
         // key the exact window (see aeroMakeKeyWindow). The private call is bracketed by a best-effort
         // crash flag so it disables itself on next launch if it ever crashes (checkFocusPrivateApiCrashGuard).
-        if NSScreen.screensHaveSeparateSpaces, monitors.count > 1,
+        if NSScreen.screensHaveSeparateSpaces, monitorInfos.count > 1,
            !UserDefaults.standard.bool(forKey: privateFocusApiDisabledKey)
         {
             MacApp.focusJob = withWindowAsync(windowId, .cancellable) { [pid] window, job in
