@@ -83,3 +83,31 @@ screen takes precedence and exits Focus Mode.
 To return to the earlier version, remove the binding before installing the
 previous signed `0.21.3-aspect` app and CLI. The existing width-rule keys can
 stay in the configuration because that earlier build already supports them.
+
+## Upstream pull requests included
+
+The `focus-mode-upstream-2026-10` branch also merges these open upstream pull
+requests, which fix bugs that affect my multi-monitor setup. Each is merged
+unchanged except where noted.
+
+- [#2232](https://github.com/nikitabobko/AeroSpace/pull/2232): avoid a crash
+  while displays are being reconfigured.
+- [#2281](https://github.com/nikitabobko/AeroSpace/pull/2281): avoid a `focus`
+  crash when a floating window moves or closes during the command.
+- [#2220](https://github.com/nikitabobko/AeroSpace/pull/2220): a window made
+  floating by `on-window-detected` no longer stays at its tile position.
+- [#1944](https://github.com/nikitabobko/AeroSpace/pull/1944):
+  `move-workspace-to-monitor` chooses the replacement workspace before moving.
+- [#2299](https://github.com/nikitabobko/AeroSpace/pull/2299): a cancelled
+  focus request no longer steals focus from a newer one.
+- [#2179](https://github.com/nikitabobko/AeroSpace/pull/2179): with separate
+  Spaces per display, focus lands on the requested window of a multi-window app
+  rather than one on another monitor (issue #101). Adapted to the upstream
+  `Monitor` to `MonitorInfo` rename.
+- [#2201](https://github.com/nikitabobko/AeroSpace/pull/2201): restore focus
+  after a transient dialog closes.
+- [#2225](https://github.com/nikitabobko/AeroSpace/pull/2225): a new native
+  tab (Finder, Ghostty) takes its predecessor's place in the tree (issue #68).
+  One line resolved by hand to keep #2220's change as well.
+- [#2174](https://github.com/nikitabobko/AeroSpace/pull/2174): a window
+  returns to its place in the layout after macOS native full screen.
