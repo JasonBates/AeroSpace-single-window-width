@@ -155,6 +155,15 @@ final class MacWindow: Window {
         if !skipClosedWindowsCache { cacheClosedWindowIfNeeded() }
         let parent = unbindFromParent().parent
         let deadWindowWorkspace = parent.nodeWorkspace
+        forgetWindowWorkspace(windowId)
+        if !(parent is MacosPopupWindowsContainer) { // Popups don't get window-detected either
+            broadcastEvent(.windowClosed(
+                windowId: windowId,
+                workspace: deadWindowWorkspace?.name,
+                appBundleId: app.rawAppBundleId,
+                appName: app.name,
+            ))
+        }
         let focus = focus
         if let deadWindowWorkspace, deadWindowWorkspace == focus.workspace ||
             deadWindowWorkspace == prevFocusedWorkspace && prevFocusedWorkspaceDate.distance(to: .now) < 1
@@ -351,6 +360,8 @@ func onWindowDetected(_ env: CmdEnv, _ io: CmdIo, _ window: Window) async -> Int
         appBundleId: window.app.rawAppBundleId,
         appName: window.app.name,
     ))
+    // on-window-detected callbacks may move the window. Remember where it started so the move is reported
+    rememberWindowWorkspace(window)
     var lastExitCode = Int32ExitCode.succ
     for callback in config.onWindowDetected where await callback.matches(window) {
         lastExitCode = await callback.run.run(env.withWindowId(window.windowId), io)

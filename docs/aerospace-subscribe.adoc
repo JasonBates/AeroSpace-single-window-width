@@ -48,6 +48,10 @@ mode-changed:: Fired when the binding mode changes. Includes `mode`.
 
 window-detected:: Fired when a new window is detected. Includes `windowId`, `workspace`, `appBundleId`, `appName`.
 
+window-closed:: Fired when a window is closed. Includes `windowId`, `workspace`, `appBundleId`, `appName`.
+
+window-moved:: Fired when a window moves to a different workspace, including moves made by `on-window-detected` callbacks. Includes `windowId`, `workspace`, `prevWorkspace`, `appBundleId`, `appName`.
+
 binding-triggered:: Fired when a keyboard binding is triggered. Includes `binding`, `mode`.
 
 // =========================================================== Output Format
