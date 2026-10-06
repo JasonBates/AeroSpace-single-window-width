@@ -39,6 +39,24 @@ final class WindowEventsTest: XCTestCase {
         assertEquals(collectWindowMovedEvents().count, 0)
     }
 
+    func testReportsMinimizeAndRestore() {
+        let window = TestWindow.new(id: 1, parent: focus.workspace.rootTilingContainer)
+        _ = collectWindowMovedEvents()
+
+        window.bind(to: macosMinimizedWindowsContainer, adaptiveWeight: WEIGHT_AUTO, index: INDEX_BIND_LAST)
+        let minimized = collectWindowMovedEvents().map(json)
+        assertEquals(minimized.count, 1)
+        assertTrue(minimized[0].contains(#""prevWorkspace":"setUpWorkspacesForTests""#))
+        assertFalse(minimized[0].contains(#""workspace":"#))
+
+        window.bind(to: focus.workspace.rootTilingContainer, adaptiveWeight: 1, index: INDEX_BIND_LAST)
+        let restored = collectWindowMovedEvents().map(json)
+        assertEquals(restored.count, 1)
+        assertTrue(restored[0].contains(#""workspace":"setUpWorkspacesForTests""#))
+        assertFalse(restored[0].contains("prevWorkspace"))
+        window.unbindFromParent()
+    }
+
     private func json(_ event: ServerEvent) -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]

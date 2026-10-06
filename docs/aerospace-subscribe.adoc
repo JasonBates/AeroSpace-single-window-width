@@ -50,7 +50,7 @@ window-detected:: Fired when a new window is detected. Includes `windowId`, `wor
 
 window-closed:: Fired when a window is closed. Includes `windowId`, `workspace`, `appBundleId`, `appName`.
 
-window-moved:: Fired when a window moves to a different workspace, including moves made by `on-window-detected` callbacks. Includes `windowId`, `workspace`, `prevWorkspace`, `appBundleId`, `appName`.
+window-moved:: Fired when a window moves to a different workspace, including moves made by `on-window-detected` callbacks, and when a window is minimized (`workspace` is absent) or restored from the Dock (`prevWorkspace` is absent). Includes `windowId`, `workspace`, `prevWorkspace`, `appBundleId`, `appName`.
 
 binding-triggered:: Fired when a keyboard binding is triggered. Includes `binding`, `mode`.
 

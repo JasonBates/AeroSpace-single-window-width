@@ -1,10 +1,18 @@
 import Common
 
-/// The workspace of every window as of the last check. Used to report window-moved events
+/// The workspace of every window as of the last check. Used to report window-moved events.
+/// Minimized windows are recorded as `minimizedMarker`; workspace names are never empty
 @MainActor private var lastKnownWindowWorkspaces: [UInt32: String] = [:]
+private let minimizedMarker = ""
+
+/// Where a window is for window-moved purposes: its workspace name, `minimizedMarker`, or nil if untracked (popups)
+@MainActor private func trackedLocation(_ window: Window) -> String? {
+    if let workspace = window.nodeWorkspace { return workspace.name }
+    return window.parent is MacosMinimizedWindowsContainer ? minimizedMarker : nil
+}
 
 @MainActor func rememberWindowWorkspace(_ window: Window) {
-    lastKnownWindowWorkspaces[window.windowId] = window.nodeWorkspace?.name
+    lastKnownWindowWorkspaces[window.windowId] = trackedLocation(window)
 }
 
 @MainActor func forgetWindowWorkspace(_ windowId: UInt32) {
@@ -18,23 +26,24 @@ import Common
     }
 }
 
-/// Windows that are on a different workspace than at the previous check.
-/// Windows outside any workspace (minimized, popups) are not tracked
+/// Windows that are somewhere else than at the previous check: on another workspace, minimized
+/// (the event has no `workspace`) or restored from the Dock (the event has no `prevWorkspace`)
 @MainActor func collectWindowMovedEvents() -> [ServerEvent] {
+    let windows = Workspace.all.flatMap(\.allLeafWindowsRecursive) +
+        macosMinimizedWindowsContainer.children.filterIsInstance(of: Window.self)
     var current: [UInt32: String] = [:]
     var events: [ServerEvent] = []
-    for workspace in Workspace.all {
-        for window in workspace.allLeafWindowsRecursive {
-            current[window.windowId] = workspace.name
-            if let prevWorkspace = lastKnownWindowWorkspaces[window.windowId], prevWorkspace != workspace.name {
-                events.append(.windowMoved(
-                    windowId: window.windowId,
-                    workspace: workspace.name,
-                    prevWorkspace: prevWorkspace,
-                    appBundleId: window.app.rawAppBundleId,
-                    appName: window.app.name,
-                ))
-            }
+    for window in windows {
+        guard let location = trackedLocation(window) else { continue }
+        current[window.windowId] = location
+        if let prev = lastKnownWindowWorkspaces[window.windowId], prev != location {
+            events.append(.windowMoved(
+                windowId: window.windowId,
+                workspace: location == minimizedMarker ? nil : location,
+                prevWorkspace: prev == minimizedMarker ? nil : prev,
+                appBundleId: window.app.rawAppBundleId,
+                appName: window.app.name,
+            ))
         }
     }
     lastKnownWindowWorkspaces = current
