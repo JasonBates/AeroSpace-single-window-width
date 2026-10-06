@@ -114,7 +114,8 @@ unchanged except where noted.
 
 ## Additions on `features-2026-10`
 
-The `features-2026-10` branch builds on the branch above with three additions,
+The `features-2026-10` branch builds on the branch above with three additions
+and a fix for hidden windows,
 each covered by unit tests and checked live on a three-monitor Mac.
 
 - `center` centres a floating window on its monitor, shrinking it if it is
@@ -126,6 +127,14 @@ each covered by unit tests and checked live on a three-monitor Mac.
 - `aerospace subscribe` gains `window-closed` and `window-moved` events, so a
   workspace bar can follow windows without polling `list-windows`.
   `window-moved` also reports moves made by `on-window-detected` callbacks.
+
+It also changes where hidden windows are parked. AeroSpace hides the windows of
+invisible workspaces in a bottom corner of their monitor. When both bottom
+corners of a monitor touch a neighbouring monitor, as for the middle of three
+side-by-side monitors, macOS and some apps (Activity Monitor) pull the parked
+window onto the neighbour, AeroSpace parks it again, and it flickers at the
+bottom of that monitor. Such a monitor now parks its hidden windows in the
+nearest clean outer corner of another monitor.
 
 With these, a rule can open a window floating, sized and centred:
 
