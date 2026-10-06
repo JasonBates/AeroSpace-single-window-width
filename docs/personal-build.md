@@ -111,3 +111,26 @@ unchanged except where noted.
   One line resolved by hand to keep #2220's change as well.
 - [#2174](https://github.com/nikitabobko/AeroSpace/pull/2174): a window
   returns to its place in the layout after macOS native full screen.
+
+## Additions on `features-2026-10`
+
+The `features-2026-10` branch builds on the branch above with three additions,
+each covered by unit tests and checked live on a three-monitor Mac.
+
+- `center` centres a floating window on its monitor, shrinking it if it is
+  larger than the monitor ([upstream issue #494](https://github.com/nikitabobko/AeroSpace/issues/494)).
+- `resize` works on floating windows ([upstream issue #9](https://github.com/nikitabobko/AeroSpace/issues/9)).
+  The window is resized around its centre and kept inside its monitor. `width`
+  and `height` change one side; `smart` changes the longer side and
+  `smart-opposite` the shorter one, keeping the aspect ratio.
+- `aerospace subscribe` gains `window-closed` and `window-moved` events, so a
+  workspace bar can follow windows without polling `list-windows`.
+  `window-moved` also reports moves made by `on-window-detected` callbacks.
+
+With these, a rule can open a window floating, sized and centred:
+
+```toml
+[[on-window-detected]]
+    if.app-id = 'com.apple.QuickTimePlayerX'
+    run = ['layout floating', 'resize smart 1600', 'center']
+```
