@@ -204,9 +204,10 @@ final class MacWindow: Window {
     }
 
     // todo it's part of the window layout and should be moved to layoutRecursive.swift
+    /// `monitor` is the monitor whose corner the window is parked in. Defaults to the window's own monitor
     @MainActor
-    func hideInCorner(_ corner: OptimalHideCorner) async throws {
-        guard let nodeMonitor else { return }
+    func hideInCorner(_ corner: OptimalHideCorner, on monitor: MonitorInfo? = nil) async throws {
+        guard let nodeMonitor = monitor ?? nodeMonitor else { return }
         // Don't accidentally override prevUnhiddenEmulationPosition in case of subsequent `hideInCorner` calls
         if !isHiddenInCorner {
             guard let windowRect = try await getAxRect(.cancellable) else { return }
