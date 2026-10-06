@@ -435,13 +435,14 @@ private func parseSingleWindowWidthRules(_ raw: OrderedJson, _ backtrace: Config
             }
             guard fields.count == 2,
                   let rawMinWidth = fields["min-monitor-width"],
-                  let rawPercent = fields["width-percent"] else {
+                  let rawPercent = fields["width-percent"]
+            else {
                 return .failure(.init(location, "Expected exactly 'min-monitor-width' and 'width-percent'"))
             }
             guard let minWidth = rawMinWidth.asIntOrNil, minWidth >= 0 else {
                 return .failure(.init(location + .key("min-monitor-width"), "Expected a non-negative integer"))
             }
-            guard let percent = rawPercent.asIntOrNil, (1...100).contains(percent) else {
+            guard let percent = rawPercent.asIntOrNil, (1 ... 100).contains(percent) else {
                 return .failure(.init(location + .key("width-percent"), "Expected an integer from 1 to 100"))
             }
             guard !result.contains(where: { $0.minMonitorWidth == minWidth }) else {

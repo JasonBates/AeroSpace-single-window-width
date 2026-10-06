@@ -67,7 +67,7 @@ final class FocusMode {
         let baseWidth = config.singleWindowWidth(
             monitorWidth: monitor.width,
             availableWidth: available.width,
-            height: available.height - 1
+            height: available.height - 1,
         ) ?? available.width * 0.66
         let width = window.singleWindowWidth(base: baseWidth, available: available.width)
         return Rect(

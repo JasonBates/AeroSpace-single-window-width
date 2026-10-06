@@ -16,7 +16,7 @@ extension Workspace {
            let constrainedWidth = config.singleWindowWidth(
                monitorWidth: workspaceMonitor.width,
                availableWidth: width,
-               height: height
+               height: height,
            )
         {
             let loneWindow = rootTilingContainer.hasSingleLeafWindowRecursive
