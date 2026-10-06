@@ -1,0 +1,46 @@
+= aerospace-center(1)
+include::util/man-attributes.adoc[]
+:manname: aerospace-center
+// tag::purpose[]
+:manpurpose: Centre the focused floating window on its monitor
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospace center [-h|--help] [--window-id <window-id>]
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+{manpurpose}
+
+The window keeps its size unless it is larger than the monitor, in which case it is shrunk to fit.
+The command fails for tiling windows and for windows on workspaces that are not visible.
+
+Combine it with `layout floating` and `resize` in `on-window-detected` callbacks to open a window
+floating, sized and centred:
+
+[source,toml]
+----
+[[on-window-detected]]
+    if.app-id = 'com.apple.QuickTimePlayerX'
+    run = ['layout floating', 'resize width 1600', 'resize height 928', 'center']
+----
+
+// =========================================================== Options
+include::./util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+
+--window-id <window-id>::
+include::./util/window-id-flag-desc.adoc[]
+
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]

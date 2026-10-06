@@ -12,6 +12,13 @@ include::aerospace-balance-sizes.adoc[tags=synopsis]
 include::aerospace-balance-sizes.adoc[tags=purpose]
 include::aerospace-balance-sizes.adoc[tags=body]
 
+== center
+----
+include::aerospace-center.adoc[tags=synopsis]
+----
+include::aerospace-center.adoc[tags=purpose]
+include::aerospace-center.adoc[tags=body]
+
 == close
 ----
 include::aerospace-close.adoc[tags=synopsis]

@@ -205,4 +205,37 @@ final class ResizeCommandTest: XCTestCase {
         assertEquals(secondWindow.singleWindowWidthAdjustment, 0)
         assertEquals(window.singleWindowWidth(base: 960, available: 1920), 200)
     }
+
+    func testFloatingWidthKeepsCentre() async throws {
+        let window = TestWindow.new(id: 1, parent: focus.workspace.floatingWindowsContainer, rect: Rect(topLeftX: 500, topLeftY: 300, width: 400, height: 200))
+        assertTrue(window.focusWindow())
+
+        await parseCommand("resize width +100").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        let rect = try await window.getAxRect(.nonCancellable)
+        assertEquals(rect?.size, CGSize(width: 500, height: 200))
+        assertEquals(rect?.center, CGPoint(x: 700, y: 400))
+    }
+
+    func testFloatingSmartScalesLongerSideKeepingAspectRatio() async throws {
+        let window = TestWindow.new(id: 1, parent: focus.workspace.floatingWindowsContainer, rect: Rect(topLeftX: 500, topLeftY: 300, width: 400, height: 200))
+        assertTrue(window.focusWindow())
+
+        await parseCommand("resize smart -100").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals((try await window.getAxRect(.nonCancellable))?.size, CGSize(width: 300, height: 150))
+
+        await parseCommand("resize smart-opposite 300").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals((try await window.getAxRect(.nonCancellable))?.size, CGSize(width: 600, height: 300))
+    }
+
+    func testFloatingResizeStaysInsideMonitor() async throws {
+        let bounds = focus.workspace.workspaceMonitor.visibleRectPaddedByOuterGaps
+        let window = TestWindow.new(id: 1, parent: focus.workspace.floatingWindowsContainer, rect: Rect(topLeftX: bounds.topLeftX, topLeftY: bounds.topLeftY, width: 400, height: 200))
+        assertTrue(window.focusWindow())
+
+        await parseCommand("resize height \(Int(bounds.height) + 1000)").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        let rect = try await window.getAxRect(.nonCancellable)
+        assertEquals(rect?.height, bounds.height)
+        assertEquals(rect?.topLeftX, bounds.topLeftX)
+        assertEquals(rect?.topLeftY, bounds.topLeftY)
+    }
 }
